@@ -29,9 +29,10 @@ jobs:
           SNOWSQL_ROLE: SYSADMIN
         run: |
           echo "🟢 Ejecutando scripts .sql con Python"
-          python3 <<EOF
+          python3 -c "
 import os
 import snowflake.connector
+import glob
 
 ctx = snowflake.connector.connect(
     user=os.environ['SNOWSQL_USER'],
@@ -45,16 +46,15 @@ ctx = snowflake.connector.connect(
 
 cs = ctx.cursor()
 try:
-    import glob
-    files = sorted(glob.glob("*.sql"))
+    files = sorted(glob.glob('*.sql'))
     for file in files:
-        print(f"⏳ Ejecutando: {file}")
+        print(f'⏳ Ejecutando: {file}')
         with open(file, 'r') as f:
             sql = f.read()
-            for statement in sql.split(';'):
-                if statement.strip():
-                    cs.execute(statement)
+            statements = [stmt.strip() for stmt in sql.split(';') if stmt.strip()]
+            for stmt in statements:
+                cs.execute(stmt)
 finally:
     cs.close()
     ctx.close()
-EOF
+"
