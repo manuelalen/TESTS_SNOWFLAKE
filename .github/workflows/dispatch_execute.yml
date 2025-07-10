@@ -1,4 +1,4 @@
-name: Ejecutar scripts en Snowflake
+name: Ejecutar scripts en Snowflake con SnowSQL
 
 on:
   push:
@@ -13,35 +13,22 @@ jobs:
       - name: Clonar repositorio
         uses: actions/checkout@v3
 
-      - name: Instalar CLI moderna de Snowflake
+      - name: Instalar SnowSQL clásico
         run: |
-          python3 -m pip install --upgrade pip
-          pip install --user snowflake-cli-labs
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.27-linux_x86_64.bash
+          bash snowsql-1.2.27-linux_x86_64.bash -y
 
-      - name: Añadir SnowCLI al PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Ejecutar scripts SQL
+      - name: Ejecutar scripts .sql con SnowSQL
         env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWSQL_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWSQL_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWSQL_PWD }}
-          SNOWFLAKE_ROLE: SYSADMIN                # Modifica si es otro
-          SNOWFLAKE_WAREHOUSE: COMPUTE_WH         # Cambia según tu warehouse
-          SNOWFLAKE_DATABASE: DEV_LEARN_DWH
-          SNOWFLAKE_SCHEMA: TEST_SCHEMA
+          SNOWSQL_ACCOUNT: ${{ secrets.SNOWSQL_ACCOUNT }}
+          SNOWSQL_USER: ${{ secrets.SNOWSQL_USER }}
+          SNOWSQL_PWD: ${{ secrets.SNOWSQL_PWD }}
         run: |
-          echo "🟢 Ejecutando scripts .sql..."
-
+          export PATH=$PATH:$HOME/bin
           for file in $(find . -name "*.sql" | sort); do
             echo "⏳ Ejecutando: $file"
-            snow sql \
-              --account $SNOWFLAKE_ACCOUNT \
-              --user $SNOWFLAKE_USER \
-              --password $SNOWFLAKE_PASSWORD \
-              --role $SNOWFLAKE_ROLE \
-              --warehouse $SNOWFLAKE_WAREHOUSE \
-              --database $SNOWFLAKE_DATABASE \
-              --schema $SNOWFLAKE_SCHEMA \
-              --filename "$file"
+            snowsql -a $SNOWSQL_ACCOUNT \
+                    -u $SNOWSQL_USER \
+                    -p $SNOWSQL_PWD \
+                    -f "$file"
           done
