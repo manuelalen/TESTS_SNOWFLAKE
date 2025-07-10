@@ -1,0 +1,24 @@
+# .github/workflows/dispatch_dry.yml
+name: Comprobación breve (Dry Run)
+
+on:
+  push:
+    branches:
+      - '**'    # Todas las ramas (o restringe si quieres)
+  workflow_dispatch:
+
+jobs:
+  check_sql:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Validar que los archivos SQL no estén vacíos
+        run: |
+          for file in $(find . -name "*.sql"); do
+            if [ ! -s "$file" ]; then
+              echo "ERROR: Archivo vacío -> $file"
+              exit 1
+            fi
+          done
