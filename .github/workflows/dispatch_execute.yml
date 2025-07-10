@@ -14,11 +14,11 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v3
 
-      - name: Instalar SnowSQL
+      - name: Instalar SnowSQL (por dpkg)
         run: |
-          sudo apt-get update && sudo apt-get install -y curl unzip
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.24-linux_x86_64.bash
-          bash snowsql-1.2.24-linux_x86_64.bash
+          sudo apt-get update
+          curl -L -o snowsql-1.2.24.deb https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.24.deb
+          sudo dpkg -i snowsql-1.2.24.deb
 
       - name: Ejecutar script SQL en Snowflake
         env:
