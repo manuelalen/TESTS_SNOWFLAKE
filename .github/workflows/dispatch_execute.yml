@@ -1,28 +1,34 @@
 # .github/workflows/dispatch_execute.yml
-name: Ejecutar script en Snowflake tras merge
+name: Ejecutar scripts en Snowflake al hacer merge
 
 on:
   push:
     branches:
-      - main  # Solo cuando hay un push en main (típico tras merge)
-  workflow_dispatch:
+      - main
 
 jobs:
-  run_script:
+  ejecutar_en_snowflake:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout código
+      - name: Clonar repositorio
         uses: actions/checkout@v3
 
-      - name: Instalar Snowflake CLI (v2, por pip)
+      - name: Instalar Snowflake CLI (snowcli)
         run: |
           python3 -m pip install --upgrade pip
           pip install snowflake-cli-labs
 
-      - name: Ejecutar script SQL en Snowflake
+      - name: Configurar conexión y ejecutar scripts
         env:
-          SNOWSQL_ACCOUNT: ${{ secrets.SNOWSQL_ACCOUNT }}
-          SNOWSQL_USER: ${{ secrets.SNOWSQL_USER }}
-          SNOWSQL_PWD: ${{ secrets.SNOWSQL_PWD }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWSQL_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWSQL_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWSQL_PWD }}
         run: |
-          ./snowsql -a $SNOWSQL_ACCOUNT -u $SNOWSQL_USER -p $SNOWSQL_PWD -f path/a/tu/script.sql
+          snowcli config add --account $SNOWFLAKE_ACCOUNT --user $SNOWFLAKE_USER --password $SNOWFLAKE_PASSWORD --alias ci
+
+          echo "🟢 Ejecutando scripts .sql modificados..."
+          for file in $(find . -name "*.sql" | sort); do
+            echo "⏳ Ejecutando: $file"
+            snowcli sql run --config ci --file "$file"
+          done
