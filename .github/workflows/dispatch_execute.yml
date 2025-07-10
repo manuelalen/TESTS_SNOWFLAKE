@@ -1,60 +1,26 @@
-name: Ejecutar scripts en Snowflake con Python Connector
+name: Ejecutar en Snowflake
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  ejecutar_en_snowflake:
+  ejecutar_sql:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clonar el repositorio
+      - name: Clonar el repo
         uses: actions/checkout@v3
 
-      - name: Instalar dependencias
+      - name: Instalar Snowflake Connector
         run: |
           python3 -m pip install --upgrade pip
           pip install snowflake-connector-python
 
-      - name: Ejecutar scripts .sql en Snowflake
+      - name: Ejecutar SQL
         env:
           SNOWSQL_ACCOUNT: ${{ secrets.SNOWSQL_ACCOUNT }}
           SNOWSQL_USER: ${{ secrets.SNOWSQL_USER }}
           SNOWSQL_PWD: ${{ secrets.SNOWSQL_PWD }}
-          SNOWSQL_DATABASE: DEV_LEARN_DWH
-          SNOWSQL_SCHEMA: TEST_SCHEMA
-          SNOWSQL_WAREHOUSE: COMPUTE_WH
-          SNOWSQL_ROLE: SYSADMIN
         run: |
-          echo "🟢 Ejecutando scripts .sql con Python"
-          python3 -c "
-import os
-import snowflake.connector
-import glob
-
-ctx = snowflake.connector.connect(
-    user=os.environ['SNOWSQL_USER'],
-    password=os.environ['SNOWSQL_PWD'],
-    account=os.environ['SNOWSQL_ACCOUNT'],
-    warehouse=os.environ['SNOWSQL_WAREHOUSE'],
-    database=os.environ['SNOWSQL_DATABASE'],
-    schema=os.environ['SNOWSQL_SCHEMA'],
-    role=os.environ['SNOWSQL_ROLE']
-)
-
-cs = ctx.cursor()
-try:
-    files = sorted(glob.glob('*.sql'))
-    for file in files:
-        print(f'⏳ Ejecutando: {file}')
-        with open(file, 'r') as f:
-            sql = f.read()
-            statements = [stmt.strip() for stmt in sql.split(';') if stmt.strip()]
-            for stmt in statements:
-                cs.execute(stmt)
-finally:
-    cs.close()
-    ctx.close()
-"
+          python3 script.py
