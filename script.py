@@ -2,8 +2,8 @@ import snowflake.connector
 import os
 
 conn = snowflake.connector.connect(
-    user=os.environ['SNOWFLAKE_USER'],
-    password=os.environ['SNOWFLAKE_PASSWORD'],
+    user='manolitoalen',
+    password='Manolitosnowflake_13',
     account='nc47394.azure-westeurope',  # ← ¡ESTE es el valor correcto!
     warehouse='COMPUTE_WH',
     database='DEV_LEARN_DWH',
