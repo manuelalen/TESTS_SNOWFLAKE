@@ -18,4 +18,5 @@ VALUES
 ('María García', '2025-01-15', FALSE, 'PLATA', 780.00, 'Inactivo desde abril', '2025-06-10 18:44:00', 'NUEVO', 7.5),
 ('Lucía Fernández', '2025-03-30', TRUE, 'BRONCE', 320.25, NULL, '2025-07-01 08:30:00', 'RECURRENTE', 8.0),
 ('Pedro Sánchez', '2025-06-05', TRUE, 'ORO', 2200.00, 'Alta satisfacción', '2025-07-09 20:15:00', 'RECURRENTE', 9.9),
-('Ana López', '2025-07-01', TRUE, 'PLATA', 1020.30, 'Cliente nuevo con potencial', CURRENT_TIMESTAMP, 'NUEVO', 8.7);
+('Ana López', '2025-07-01', TRUE, 'PLATA', 1020.30, 'Cliente nuevo con potencial', CURRENT_TIMESTAMP, 'NUEVO', 8.7),
+('María López', '2025-07-09', TRUE, 'PLATA', 987.30, 'Cliente nuevo con potencial', CURRENT_TIMESTAMP, 'NUEVO', 8.7);
