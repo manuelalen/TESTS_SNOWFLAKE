@@ -1,4 +1,3 @@
-# .github/workflows/dispatch_execute.yml
 name: Ejecutar scripts en Snowflake al hacer merge
 
 on:
@@ -14,26 +13,32 @@ jobs:
       - name: Clonar repositorio
         uses: actions/checkout@v3
 
-      - name: Instalar Snowflake CLI moderna
+      - name: Instalar Snowflake CLI moderna (snow)
         run: |
           python3 -m pip install --upgrade pip
           pip install --user snowflake-cli-labs
 
-      - name: Ejecutar todos los .sql con snow
+      - name: Ejecutar todos los .sql con Snowflake CLI
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWSQL_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWSQL_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWSQL_PWD }}
-          SNOWFLAKE_ROLE: SYSADMIN             # o el que necesites
-          SNOWFLAKE_WAREHOUSE: COMPUTE_WH      # ajusta al tuyo
+          SNOWFLAKE_ROLE: SYSADMIN                # Cambia si usas otro rol
+          SNOWFLAKE_WAREHOUSE: COMPUTE_WH         # Ajusta si tu warehouse es otro
           SNOWFLAKE_DATABASE: DEV_LEARN_DWH
           SNOWFLAKE_SCHEMA: TEST_SCHEMA
         run: |
           export PATH=$PATH:/home/runner/.local/bin
-          
+
           echo "🟢 Ejecutando scripts .sql..."
           for file in $(find . -name "*.sql" | sort); do
             echo "⏳ Ejecutando: $file"
-            snow sql  --filename "$file"
-
+            snow sql --account $SNOWFLAKE_ACCOUNT \
+                     --user $SNOWFLAKE_USER \
+                     --password $SNOWFLAKE_PASSWORD \
+                     --role $SNOWFLAKE_ROLE \
+                     --warehouse $SNOWFLAKE_WAREHOUSE \
+                     --database $SNOWFLAKE_DATABASE \
+                     --schema $SNOWFLAKE_SCHEMA \
+                     --filename "$file"
           done
