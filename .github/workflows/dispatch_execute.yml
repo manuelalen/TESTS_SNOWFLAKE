@@ -14,21 +14,23 @@ jobs:
       - name: Clonar repositorio
         uses: actions/checkout@v3
 
-      - name: Instalar Snowflake CLI (snow)
+      - name: Instalar Snowflake CLI moderna
         run: |
           python3 -m pip install --upgrade pip
           pip install --user snowflake-cli-labs
 
-      - name: Ejecutar scripts .sql en orden
+      - name: Ejecutar todos los .sql con snow
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWSQL_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWSQL_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWSQL_PWD }}
+          SNOWFLAKE_ROLE: SYSADMIN             # o el que necesites
+          SNOWFLAKE_WAREHOUSE: COMPUTE_WH      # ajusta al tuyo
+          SNOWFLAKE_DATABASE: DEV_LEARN_DWH
+          SNOWFLAKE_SCHEMA: TEST_SCHEMA
         run: |
           export PATH=$PATH:/home/runner/.local/bin
           
-          snow config init --account $SNOWFLAKE_ACCOUNT --user $SNOWFLAKE_USER --password $SNOWFLAKE_PASSWORD --non-interactive --default
-
           echo "🟢 Ejecutando scripts .sql..."
           for file in $(find . -name "*.sql" | sort); do
             echo "⏳ Ejecutando: $file"
