@@ -23,4 +23,4 @@ jobs:
           SNOWSQL_USER: ${{ secrets.SNOWSQL_USER }}
           SNOWSQL_PWD: ${{ secrets.SNOWSQL_PWD }}
         run: |
-          python3 TB_SNOWFLAKE_1_0_0.sql
+          python3 script.py
