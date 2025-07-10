@@ -12,7 +12,7 @@ conn = snowflake.connector.connect(
     schema="TEST_SCHEMA",
     role="SYSADMIN"
 )
-
+# no funca
 cur = conn.cursor()
 
 try:
