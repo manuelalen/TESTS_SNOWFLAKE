@@ -1,4 +1,4 @@
-name: Ejecutar scripts en Snowflake al hacer merge
+name: Ejecutar scripts en Snowflake
 
 on:
   push:
@@ -13,32 +13,35 @@ jobs:
       - name: Clonar repositorio
         uses: actions/checkout@v3
 
-      - name: Instalar Snowflake CLI moderna (snow)
+      - name: Instalar CLI moderna de Snowflake
         run: |
           python3 -m pip install --upgrade pip
           pip install --user snowflake-cli-labs
 
-      - name: Ejecutar todos los .sql con Snowflake CLI
+      - name: Añadir SnowCLI al PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Ejecutar scripts SQL
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWSQL_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWSQL_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWSQL_PWD }}
-          SNOWFLAKE_ROLE: SYSADMIN                # Cambia si usas otro rol
-          SNOWFLAKE_WAREHOUSE: COMPUTE_WH         # Ajusta si tu warehouse es otro
+          SNOWFLAKE_ROLE: SYSADMIN                # Modifica si es otro
+          SNOWFLAKE_WAREHOUSE: COMPUTE_WH         # Cambia según tu warehouse
           SNOWFLAKE_DATABASE: DEV_LEARN_DWH
           SNOWFLAKE_SCHEMA: TEST_SCHEMA
         run: |
-          export PATH=$PATH:/home/runner/.local/bin
-
           echo "🟢 Ejecutando scripts .sql..."
+
           for file in $(find . -name "*.sql" | sort); do
             echo "⏳ Ejecutando: $file"
-            snow sql --account $SNOWFLAKE_ACCOUNT \
-                     --user $SNOWFLAKE_USER \
-                     --password $SNOWFLAKE_PASSWORD \
-                     --role $SNOWFLAKE_ROLE \
-                     --warehouse $SNOWFLAKE_WAREHOUSE \
-                     --database $SNOWFLAKE_DATABASE \
-                     --schema $SNOWFLAKE_SCHEMA \
-                     --filename "$file"
+            snow sql \
+              --account $SNOWFLAKE_ACCOUNT \
+              --user $SNOWFLAKE_USER \
+              --password $SNOWFLAKE_PASSWORD \
+              --role $SNOWFLAKE_ROLE \
+              --warehouse $SNOWFLAKE_WAREHOUSE \
+              --database $SNOWFLAKE_DATABASE \
+              --schema $SNOWFLAKE_SCHEMA \
+              --filename "$file"
           done
