@@ -34,6 +34,6 @@ jobs:
           echo "🟢 Ejecutando scripts .sql..."
           for file in $(find . -name "*.sql" | sort); do
             echo "⏳ Ejecutando: $file"
-            snow sql run --filename "$file"
+            snow sql  --filename "$file"
 
           done
